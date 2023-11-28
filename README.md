@@ -54,7 +54,7 @@ Realizovati aplikaciju za online kupovinu. Postoje tri vrste korisnika ovog sist
 
 ## 3. Implementacija sistema
 ### 3.1. Serverske platforme
-- .NET CORE
+- Python
 
 ### 3.2 Klijentske platforme
 - Single-page interface aplikacija u Reactu
