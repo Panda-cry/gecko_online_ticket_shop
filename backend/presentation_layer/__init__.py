@@ -1,0 +1,4 @@
+from application_layer.user_auth import auth_blueprint
+from application_layer.admin_resources import admin_blueprint
+auth_blueprint = auth_blueprint
+admin_blueprint = admin_blueprint

@@ -1,0 +1,55 @@
+import os
+from flask import Flask
+from flask_smorest import Api
+from db import db
+from web_bcrypt import app_bcrypt
+from flask_jwt_extended import JWTManager
+from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+from flask_migrate import Migrate
+# from application_layer.user_auth import auth_blueprint
+from presentation_layer import auth_blueprint, admin_blueprint
+load_dotenv()
+
+
+def create_app():
+    app = Flask(__name__)
+
+    app.config["PROPAGETE_EXCEPTIONS"] = os.getenv('PROPAGETE_EXCEPTIONS')
+    app.config["API_TITLE"] = os.getenv("API_TITLE")
+    app.config["API_VERSION"] = os.getenv("API_VERSION")
+    app.config["OPENAPI_VERSION"] = os.getenv("OPENAPI_VERSION")
+    app.config["OPENAPI_URL_PREFIX"] = os.getenv("OPENAPI_URL_PREFIX")
+    app.config["OPENAPI_SWAGGER_UI_PATH"] = os.getenv(
+        "OPENAPI_SWAGGER_UI_PATH")
+    app.config[
+        "OPENAPI_SWAGGER_UI_URL"] = os.getenv("OPENAPI_SWAGGER_UI_URL")
+    app.config[
+        "SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+    app.config[
+        'SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv(
+        "SQLALCHEMY_TRACK_MODIFICATIONS")  # Ovo se često postavlja na False da bi se izbegli upozorenja
+    app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+
+    db.init_app(app)
+
+    api = Api(app)
+
+
+    app_bcrypt.init_app(app)
+    migrate = Migrate(app, db)
+    jwt_manager = JWTManager(app)
+    with app.app_context():
+        from database_layer.user import UserModel
+
+        db.create_all()
+
+    api.register_blueprint(auth_blueprint)
+    api.register_blueprint(admin_blueprint)
+
+    return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run()
