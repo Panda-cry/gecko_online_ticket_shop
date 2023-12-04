@@ -8,7 +8,7 @@ from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 # from application_layer.user_auth import auth_blueprint
-from presentation_layer import auth_blueprint, admin_blueprint
+from presentation_layer import auth_blueprint, admin_blueprint,user_blueprint,seller_blueprint
 load_dotenv()
 
 
@@ -46,6 +46,8 @@ def create_app():
 
     api.register_blueprint(auth_blueprint)
     api.register_blueprint(admin_blueprint)
+    api.register_blueprint(user_blueprint)
+    api.register_blueprint(seller_blueprint)
 
     return app
 

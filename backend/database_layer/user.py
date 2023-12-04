@@ -1,5 +1,6 @@
 from db import db
-from sqlalchemy import Integer,String,Enum,DateTime,Column
+from sqlalchemy import Integer,String,Enum,DateTime,Column,Boolean
+from sqlalchemy.orm import Relationship
 import enum
 from datetime import datetime
 from web_bcrypt import app_bcrypt
@@ -20,10 +21,11 @@ class UserModel(db.Model):
     email = Column(String(80), unique=True, nullable=False)
     username = Column(String(80), unique=True, nullable=False)
     password = Column(String(80), nullable=False)
-    user_type = Column(Enum(UserRoleEnum),nullable=False)
+    user_type = Column(Enum(UserRoleEnum), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
+    orders = Relationship("OrderModel",back_populates="user",lazy=True)
+    is_verified = Column(Boolean,default=False)
     def __init__(self, email, username, password, user_type):
         self.email = email,
         self.username = username

@@ -2,6 +2,8 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from application_layer.schemas.user_schema import UserSchema, LoginSchema, \
     TokenSchema
+from application_layer.schemas.orders import OrderSchema
+from database_layer import OrderModel, UserModel
 from db import db
 from web_bcrypt import app_bcrypt
 from database_layer import UserModel
@@ -14,10 +16,19 @@ admin_blueprint = Blueprint("Admin", __name__,
                             description="Admin operations ")
 
 
-@admin_blueprint.route('/admin')
+@admin_blueprint.route('/api/users/orders')
 class AdminResource(MethodView):
 
-    @jwt_required()
+    @admin_blueprint.response(200,OrderSchema(many=True))
     def get(self):
-        print("lets goo")
-        pass
+        orders = OrderModel.query.all()
+        return orders
+
+@admin_blueprint.route('/api/users/<int:user_id>/verify')
+class AdminVerify(MethodView):
+
+    def get(self,user_id):
+        user: UserModel = UserModel.query.get_or_404(user_id)
+        user.is_verified = True
+        db.session.commit()
+        return {"message":"Verfied"},200
