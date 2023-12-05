@@ -1,21 +1,22 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from application_layer.schemas.user_schema import UserSchema, LoginSchema, \
-    TokenSchema
+    TokenSchemaDTO, UserSchemaDTO
 from db import db
 from web_bcrypt import app_bcrypt
 from database_layer import UserModel
 from datetime import timedelta
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from application_layer.token_utils import check_role
 
 auth_blueprint = Blueprint("auth", __name__,
                            description="Authentication operations ")
 
 
-@auth_blueprint.route('/login')
+@auth_blueprint.route('/api/login')
 class Login(MethodView):
     @auth_blueprint.arguments(LoginSchema)
-    @auth_blueprint.response(200, TokenSchema)
+    @auth_blueprint.response(200, TokenSchemaDTO)
     def post(self, login_data):
         user_email = UserModel.query.filter(
             UserModel.email == login_data.get('username_email')).first()
@@ -30,23 +31,30 @@ class Login(MethodView):
                                           login_data.get('password')):
             abort(404, message="Invalid password")
 
-        access_token = create_access_token(identity=user.id,
-                                           fresh=True,
-                                           expires_delta=timedelta(seconds=10),
-                                           additional_claims={
-                                               "user_type": user.user_type.name})
-        refresh_token = create_refresh_token(identity=user.id,
-                                             expires_delta=timedelta(days=1))
+        if user.user_type.name == "USER":
+            access_token = create_access_token(identity=user.id,
+                                               fresh=True,
+                                               expires_delta=timedelta(minutes=10),
+                                               additional_claims={
+                                                   "user_type": user.user_type.name})
+            refresh_token = create_refresh_token(identity=user.id,
+                                                 expires_delta=timedelta(days=1))
+        else:
+            access_token = create_access_token(identity=user.id,
+                                               fresh=True,
+                                               additional_claims={
+                                                   "user_type": user.user_type.name})
+            refresh_token = create_refresh_token(identity=user.id)
 
-        return TokenSchema().dump({"access_token": access_token,
-                                   "refresh_token": refresh_token})
+        return {"access_token": access_token,
+                "refresh_token": refresh_token}
 
 
-@auth_blueprint.route('/register')
+@auth_blueprint.route('/api/register')
 class Register(MethodView):
 
     @auth_blueprint.arguments(UserSchema)
-    @auth_blueprint.response(201, UserSchema)
+    @auth_blueprint.response(201, UserSchemaDTO)
     def post(self, user_data):
         if UserModel.query.filter(
                 UserModel.email == user_data.get('email')).first():
@@ -59,3 +67,26 @@ class Register(MethodView):
         db.session.commit()
 
         return new_user
+
+
+@auth_blueprint.route('/api/refresh')
+class RefreshToken(MethodView):
+
+    @jwt_required(refresh=True)
+    @auth_blueprint.response(200, TokenSchemaDTO)
+    def get(self):
+        user_id = get_jwt_identity()
+        user = UserModel.query.get_or_404(user_id)
+
+        if not user:
+            abort(404, message="Invalid user id")
+
+        access_token = create_access_token(identity=user.id,
+                                           expires_delta=timedelta(minutes=10),
+                                           additional_claims={
+                                               "user_type": user.user_type.name})
+        refresh_token = create_refresh_token(identity=user.id,
+                                             expires_delta=timedelta(days=1))
+
+        return {"access_token": access_token,
+                "refresh_token": refresh_token}

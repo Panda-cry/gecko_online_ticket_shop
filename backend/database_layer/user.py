@@ -1,5 +1,5 @@
 from db import db
-from sqlalchemy import Integer,String,Enum,DateTime,Column,Boolean
+from sqlalchemy import Integer,String,Enum,DateTime,Column,Boolean, LargeBinary
 from sqlalchemy.orm import Relationship
 import enum
 from datetime import datetime
@@ -26,6 +26,8 @@ class UserModel(db.Model):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     orders = Relationship("OrderModel",back_populates="user",lazy=True)
     is_verified = Column(Boolean,default=False)
+    image = Column(LargeBinary, nullable=True)
+
     def __init__(self, email, username, password, user_type):
         self.email = email,
         self.username = username

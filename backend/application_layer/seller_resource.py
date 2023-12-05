@@ -1,13 +1,13 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from application_layer.schemas.article_schema import ArticleSchema, ArticleUpdate
-from application_layer.schemas.orders import OrderSchema
+from application_layer.schemas.article_schema import ArticleSchema, \
+    ArticleUpdate, ArticleSchemaDTO
+from application_layer.schemas.orders_schema import OrdersSchemaDTO
 from db import db
-from flask import jsonify
-from database_layer import ArticleModel,OrderModel
+from database_layer import ArticleModel, OrderModel
 from database_layer.order import OrderStatus
-from datetime import timedelta
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from application_layer.token_utils import check_role
 
 seller_blueprint = Blueprint("seller", __name__,
                              description="Seller CRUD operations ")
@@ -15,13 +15,14 @@ seller_blueprint = Blueprint("seller", __name__,
 
 @seller_blueprint.route("/api/articles")
 class SellerView(MethodView):
-
-    @seller_blueprint.response(200, ArticleSchema(many=True))
+    @check_role(["SELLER","USER"])
+    @seller_blueprint.response(200, ArticleSchemaDTO(many=True))
     def get(self):
         return ArticleModel.query.all()
 
+    @check_role(["SELLER"])
     @seller_blueprint.arguments(ArticleSchema)
-    @seller_blueprint.response(201, ArticleSchema)
+    @seller_blueprint.response(201, ArticleSchemaDTO)
     def post(self, article_data):
         if ArticleModel.query.filter(
                 ArticleModel.name == article_data.get('name')).first():
@@ -36,13 +37,15 @@ class SellerView(MethodView):
 @seller_blueprint.route("/api/articles/<int:article_id>")
 class SellerView(MethodView):
 
-    @seller_blueprint.response(200, ArticleSchema)
+    @check_role(["SELLER", "USER"])
+    @seller_blueprint.response(200, ArticleSchemaDTO)
     def get(self, article_id):
         article = ArticleModel.query.get_or_404(article_id)
         return article
 
+    @check_role(["SELLER"])
     @seller_blueprint.arguments(ArticleUpdate)
-    @seller_blueprint.response(201, ArticleSchema)
+    @seller_blueprint.response(201, ArticleSchemaDTO)
     def put(self, article_data, article_id):
         article: ArticleModel = ArticleModel.query.get_or_404(article_id)
 
@@ -51,34 +54,42 @@ class SellerView(MethodView):
         article.amount = article_data.get('amount', article.amount)
         article.description = article_data.get('description',
                                                article.description)
-
+        article.image = article_data.get('image',
+                                               article.image)
         db.session.commit()
         return article
 
+    @check_role(["SELLER"])
+    @jwt_required(fresh=True)
     def delete(self, article_id):
         article: ArticleModel = ArticleModel.query.get_or_404(article_id)
 
         db.session.delete(article)
         db.session.commit()
 
-        return "Entity deleted",204
+        return "Entity deleted", 204
 
 
 @seller_blueprint.route('/api/orders')
 class SellerOrders(MethodView):
 
-    @seller_blueprint.response(200,OrderSchema(many=True))
+    @check_role(["SELLER"])
+    @seller_blueprint.response(200, OrdersSchemaDTO(many=True))
     def get(self):
-        orders = OrderModel.query.filter(OrderModel.order_status == OrderStatus.IN_TRANSPORT)
+        user_id = get_jwt_identity()
+        orders = OrderModel.query.filter(OrderModel.user_id == user_id,
+                                         OrderModel.order_status == OrderStatus.IN_TRANSPORT)
 
         return orders
 
-@seller_blueprint.route('/api/users/orders')
+
+@seller_blueprint.route('/api/seller/orders')
 class SellerOrders(MethodView):
 
-    @seller_blueprint.response(200,OrderSchema(many=True))
+    @check_role(["SELLER"])
+    @seller_blueprint.response(200, OrdersSchemaDTO(many=True))
     def get(self):
-        #TODO izvuci iz tokena user_id i pronaci ga ovde
-        orders = OrderModel.query.filter(OrderModel.order_status == OrderStatus.DELIVERED)
-
+        user_id = get_jwt_identity()
+        orders = OrderModel.query.filter(OrderModel.user_id == user_id,
+                                         OrderModel.order_status == OrderStatus.DELIVERED)
         return orders
