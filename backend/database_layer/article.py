@@ -15,4 +15,4 @@ class ArticleModel(db.Model):
     created_at = Column(DateTime,default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     orders = Relationship("OrderModel",secondary="orders_articles",back_populates="articles")
-    image = Column(LargeBinary)
+    image = Column(String, nullable=True)

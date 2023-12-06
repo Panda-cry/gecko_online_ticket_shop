@@ -26,7 +26,7 @@ class UserModel(db.Model):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     orders = Relationship("OrderModel",back_populates="user",lazy=True)
     is_verified = Column(Boolean,default=False)
-    image = Column(LargeBinary, nullable=True)
+    image = Column(String, nullable=True)
 
     def __init__(self, email, username, password, user_type):
         self.email = email,

@@ -1,0 +1,49 @@
+DEFAULT_LOCATION_CONTENT_TYPE_MAPPING = {
+    "json": "application/json",
+    "form": "application/x-www-form-urlencoded",
+    "files": "multipart/form-data",
+}
+dodajemo u argumente i tako mozemo da menjamo !! json file itd.
+
+za prenos fajlova treba da se koristi ovaj files
+
+
+Gunicorn:
+
+Gunicorn je WSGI (Web Server Gateway Interface) server za Python aplikacije. WSGI je standard koji definiše kako web serveri komuniciraju sa Python aplikacijama, omogućavajući efikasan prenos zahteva između web servera i aplikacije.
+Gunicorn omogućava paralelno izvršavanje više zahteva, što ga čini pogodnim za rad s više klijenata.
+Koristi se za pokretanje Python web aplikacija, uključujući one napisane s Flask, Django, Pyramid, itd.
+
+Nginx:
+
+Nginx je web server i obrtni proxy server koji se često koristi za posredovanje između klijenata i Gunicorn servera.
+Kada klijent šalje zahtev, Nginx može rukovati statičkim resursima direktno (npr. HTML, CSS, slike) i prosleđivati dinamičke zahteve Gunicorn serveru.
+Nginx ima sposobnost obrtnog proxyja, omogućavajući mu raditi kao posrednik između klijenata i više instanci Gunicorna, što pomaže u postizanju bolje skalabilnosti i otpornosti na greške.
+
+
+ASGI (Asynchronous Server Gateway Interface):
+
+ASGI je noviji standard koji je dizajniran da podržava asinhrone operacije i višenitne zahteve.
+Omogućava web serverima da rukuju većim brojem konekcija istovremeno pomoću asinhronog izvršavanja i koristi koncept "event loop"-a za upravljanje istovremenim operacijama.
+ASGI omogućava rukovanje real-time zahtevima, kao što su WebSocket komunikacije, što je teže postići uz pomoć tradicionalnog WSGI-ja.
+
+
+Iz istarzivanja asyncion za flask nesto je zahtevnije da se odradi
+nema toliko pluginova i ne mozemo kao ovde u projektu da odradimo
+nego moramo engine da kreiramo i sve rucno! aiopg je za postgres podatke
+
+zato je za flask namenjen gunicorn wsgi server
+a nginx se koristi da radi sa vise instanci
+npr imamo 2 gunicorn sa 2 razlicita porta i po 4 workera
+nginx moze sa jednog domena da rasporedi na 8 workera nesto
+
+nije moguce da se prenese slika zajedno sa podacima tako da neka opcija je da
+user koristi register ali da razdvojim register da budu osnovni podaci
+dok images ruta cuva slika a user ce imati naziv slike samo !!!
+
+jer svakako na cloud storage mozemo env da promenimo varijablu
+na pravi cloud storage namenjen za takva stvari
+i samo povacimo sa rute :D
+
+
+

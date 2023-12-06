@@ -7,14 +7,26 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+import logging
 # from application_layer.user_auth import auth_blueprint
 from presentation_layer import auth_blueprint, admin_blueprint,user_blueprint,seller_blueprint
 load_dotenv()
 
 
+UPLOAD_FOLDER = os.getenv("IMAGE_LOCATION")
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+
 def create_app():
     app = Flask(__name__)
-
+    app.logger.setLevel(logging.DEBUG)
+    wsgi_log = logging.getLogger('werkzeug')
+    wsgi_log.setLevel(logging.DEBUG)
+    app.config['RABBITMQ_URL'] = 'amqp://guest:guest@localhost:8080//'
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config["PROPAGETE_EXCEPTIONS"] = os.getenv('PROPAGETE_EXCEPTIONS')
     app.config["API_TITLE"] = os.getenv("API_TITLE")
     app.config["API_VERSION"] = os.getenv("API_VERSION")
@@ -30,11 +42,10 @@ def create_app():
         'SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv(
         "SQLALCHEMY_TRACK_MODIFICATIONS")  # Ovo se često postavlja na False da bi se izbegli upozorenja
     app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
-
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
     db.init_app(app)
 
     api = Api(app)
-
 
     app_bcrypt.init_app(app)
     migrate = Migrate(app, db)
@@ -51,7 +62,3 @@ def create_app():
 
     return app
 
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run()

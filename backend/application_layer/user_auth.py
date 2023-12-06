@@ -1,13 +1,15 @@
+import os
+import pika
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from application_layer.schemas.user_schema import UserSchema, LoginSchema, \
-    TokenSchemaDTO, UserSchemaDTO
+    TokenSchemaDTO, UserSchemaDTO, ImageSchema
 from db import db
 from web_bcrypt import app_bcrypt
 from database_layer import UserModel
 from datetime import timedelta
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
-from application_layer.token_utils import check_role
+from celery_workers.celery_workind_man_kind import add
 
 auth_blueprint = Blueprint("auth", __name__,
                            description="Authentication operations ")
@@ -53,8 +55,8 @@ class Login(MethodView):
 @auth_blueprint.route('/api/register')
 class Register(MethodView):
 
-    @auth_blueprint.arguments(UserSchema)
-    @auth_blueprint.response(201, UserSchemaDTO)
+    @auth_blueprint.arguments(schema=UserSchema)
+    @auth_blueprint.response(status_code=201, schema=UserSchemaDTO)
     def post(self, user_data):
         if UserModel.query.filter(
                 UserModel.email == user_data.get('email')).first():
@@ -63,10 +65,21 @@ class Register(MethodView):
             user_data.get('password'))
         new_user = UserModel(**user_data)
 
+        add.delay("tatarata", "sender_email", "message")
         db.session.add(new_user)
         db.session.commit()
-
         return new_user
+
+
+@auth_blueprint.route('/api/image')
+class UserImageUpload(MethodView):
+
+    @auth_blueprint.arguments(ImageSchema, location="files")
+    @auth_blueprint.response(201)
+    def post(self, image):
+        image = image.get('image')
+        image.save(os.getenv("IMAGE_LOCATION") + f"/{image.filename}")
+        return
 
 
 @auth_blueprint.route('/api/refresh')
