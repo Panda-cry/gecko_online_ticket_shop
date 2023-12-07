@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web_app:
-    image: web_store_app
+    build: .
     depends_on:
       rabbit_mq:
         condition: service_healthy
@@ -45,7 +45,7 @@ services:
       retries: 5
 
   worker:
-    image: web_store_app
+    build: .
     env_file:
       - .env
     entrypoint: ["/bin/bash","celery.sh"]
