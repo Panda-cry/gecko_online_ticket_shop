@@ -28,10 +28,10 @@ class UserModel(db.Model):
     is_verified = Column(Boolean,default=False)
     image = Column(String, nullable=True)
 
-    def __init__(self, email, username, password, user_type):
-        self.email = email,
-        self.username = username
-        self.password = app_bcrypt.generate_password_hash(password, 10).decode()
-        self.user_type = user_type
-        self.created_at = datetime.now()
-        self.updated_at = None
+    # def __init__(self, email, username, password, user_type):
+    #     self.email = email,
+    #     self.username = username
+    #     self.password = app_bcrypt.generate_password_hash(password, 10).decode()
+    #     self.user_type = user_type
+    #     self.created_at = datetime.now()
+    #     self.updated_at = None

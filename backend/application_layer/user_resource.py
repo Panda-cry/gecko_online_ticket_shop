@@ -33,7 +33,7 @@ class UserView(MethodView):
         user.email = update_user.get('email')
 
         user.password = app_bcrypt.generate_password_hash(
-            update_user.get('password')).decode()
+            update_user.get('password')).decode("utf-8")
         user.username = update_user.get('username')
 
         db.session.commit()
@@ -50,7 +50,7 @@ class UserView(MethodView):
         user.email = update_user.get('email', user.email)
         if update_user.get('password'):
             user.password = app_bcrypt.generate_password_hash(
-                update_user.get('password')).decode()
+                update_user.get('password')).decode("utf-8")
         user.username = update_user.get('username', user.username)
 
         db.session.commit()

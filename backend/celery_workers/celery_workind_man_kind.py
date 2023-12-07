@@ -2,12 +2,16 @@ from celery import Celery
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
-
+user = os.getenv("RABBITMQ_DEFAULT_USER")
+password = os.getenv("RABBITMQ_DEFAULT_PASS")
+host = os.getenv("RABBIT_MQ_HOST")
 celery = Celery(
     'tasks',
-    broker='pyamqp://admin:admin2017@localhost:5672//',  # Obratite pažnju na promene ovde
+    broker=f'pyamqp://{user}:{password}@{host}:5672//',
 )
+
 
 @celery.task
 def add(user_email, sender_email, message):

@@ -4,7 +4,6 @@ from flask_smorest import Api
 from db import db
 from web_bcrypt import app_bcrypt
 from flask_jwt_extended import JWTManager
-from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 import logging
@@ -22,10 +21,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 def create_app():
     app = Flask(__name__)
-    app.logger.setLevel(logging.DEBUG)
-    wsgi_log = logging.getLogger('werkzeug')
-    wsgi_log.setLevel(logging.DEBUG)
-    app.config['RABBITMQ_URL'] = 'amqp://guest:guest@localhost:8080//'
+
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config["PROPAGETE_EXCEPTIONS"] = os.getenv('PROPAGETE_EXCEPTIONS')
     app.config["API_TITLE"] = os.getenv("API_TITLE")
@@ -51,7 +47,7 @@ def create_app():
     migrate = Migrate(app, db)
     jwt_manager = JWTManager(app)
     with app.app_context():
-        from database_layer.user import UserModel
+        import database_layer
 
         db.create_all()
 
