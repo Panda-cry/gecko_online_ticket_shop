@@ -12,7 +12,6 @@ services:
       - "8000:8000"
     volumes:
       - ./:/app/backend
-      - tmp:/app/tmp
     env_file:
       - .env
       - .flaskenv
