@@ -6,6 +6,7 @@ from web_bcrypt import app_bcrypt
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+from flask_cors import  CORS
 import logging
 # from application_layer.user_auth import auth_blueprint
 from presentation_layer import auth_blueprint, admin_blueprint,user_blueprint,seller_blueprint
@@ -55,6 +56,6 @@ def create_app():
     api.register_blueprint(admin_blueprint)
     api.register_blueprint(user_blueprint)
     api.register_blueprint(seller_blueprint)
-
+    CORS(app)
     return app
 

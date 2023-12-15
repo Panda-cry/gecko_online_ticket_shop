@@ -9,6 +9,8 @@ from web_bcrypt import app_bcrypt
 from database_layer import UserModel, ArticleModel, OrderModel
 from flask_jwt_extended import get_jwt_identity
 from application_layer.token_utils import check_role
+from celery_workers.celery_workind_man_kind import convert_order
+
 user_blueprint = Blueprint("user", __name__,
                            description="User operations ")
 
@@ -23,7 +25,7 @@ class UserView(MethodView):
         user = UserModel.query.get_or_404(user_id)
         return user
 
-    @check_role(["USER"])
+    @check_role(["USER","SELLER"])
     @user_blueprint.arguments(UserPutSchema)
     @user_blueprint.response(201, UserSchemaDTO)
     def put(self, update_user):
@@ -35,12 +37,12 @@ class UserView(MethodView):
         user.password = app_bcrypt.generate_password_hash(
             update_user.get('password')).decode("utf-8")
         user.username = update_user.get('username')
-
+        user.image = update_user.get('image')
         db.session.commit()
 
         return user
 
-    @check_role(["USER"])
+    @check_role(["USER", "SELLER"])
     @user_blueprint.arguments(UserPatchSchema)
     @user_blueprint.response(201, UserSchemaDTO)
     def patch(self, update_user):
@@ -52,7 +54,7 @@ class UserView(MethodView):
             user.password = app_bcrypt.generate_password_hash(
                 update_user.get('password')).decode("utf-8")
         user.username = update_user.get('username', user.username)
-
+        user.image = update_user.get('image', user.image)
         db.session.commit()
 
         return user
@@ -92,13 +94,15 @@ class UserOrderView(MethodView):
         article.amount -= order_data.get('amount')
         db.session.add(order)
         db.session.commit()
+
+        convert_order(db, order)
         return order
 
 
 @user_blueprint.route('/api/users/orders/price_sum')
 class UserPriceView(MethodView):
 
-    @check_role(["USER"])
+    @check_role(["USER","SELLER"])
     def get(self):
         user_id = get_jwt_identity()
         user: UserModel = UserModel.query.get_or_404(user_id)
@@ -107,5 +111,7 @@ class UserPriceView(MethodView):
             _sum += order.amount * order.articles[0].price
 
         #Delivery fee
-        _sum += 200
+        if _sum >0:
+            _sum += 200
+
         return {"Sum is :": _sum}, 200

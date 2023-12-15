@@ -1,7 +1,11 @@
+import time
+
 from celery import Celery
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from database_layer import OrderModel, OrderStatus
+import random
 import os
 
 user = os.getenv("RABBITMQ_DEFAULT_USER")
@@ -35,3 +39,13 @@ def add(user_email, sender_email, message):
         server.starttls()  # Zaštita komunikacije TLS
         server.login(smtp_username, smtp_password)
         server.sendmail(smtp_username, 'petar.canic55@gmail.com', msg.as_string())
+
+
+@celery.task
+def convert_order(db, order: OrderModel):
+    random_number = random.randint(5,10)
+    time.sleep(random_number)
+
+    order.order_status = OrderStatus.DELIVERED
+
+    db.session.commit()

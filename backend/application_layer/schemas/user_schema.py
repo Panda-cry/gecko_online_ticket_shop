@@ -47,16 +47,10 @@ class UserPatchSchema(Schema):
     username = fields.Str(validate=Length(min=5))
     email = fields.Str(validate=Email())
     password = fields.Str(validate=Length(min=5))
-
+    image = fields.Str()
 
 class UserPutSchema(Schema):
     username = fields.Str(required=True, validate=Length(min=5))
     email = fields.Str(required=True, validate=Email())
     password = fields.Str(required=True, validate=Length(min=5))
-    image = fields.Raw()
-
-    @post_load
-    def _convert_image(self, in_data, **kwargs):
-        if in_data.get('image'):
-            in_data['image'] = bytes(in_data.get('image'),"utf-8")
-        return in_data
+    image = fields.Str(required=True)

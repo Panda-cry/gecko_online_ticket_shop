@@ -20,7 +20,6 @@ class Login(MethodView):
     @auth_blueprint.arguments(LoginSchema)
     @auth_blueprint.response(200, TokenSchemaDTO)
     def post(self, login_data):
-        print("a sada idemo dalje")
         user_email = UserModel.query.filter(
             UserModel.email == login_data.get('username_email')).first()
         user_username = UserModel.query.filter(
@@ -67,6 +66,7 @@ class Register(MethodView):
         new_user = UserModel(**user_data)
 
         add.delay("tatarata", "sender_email", "message")
+
         db.session.add(new_user)
         db.session.commit()
         return new_user
