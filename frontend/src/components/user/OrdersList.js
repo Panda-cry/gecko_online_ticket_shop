@@ -7,9 +7,12 @@ import OrderItem from "./OrderItem";
 function OrdersList() {
   const [orders, setOrders] = useState([]);
   useEffect(() => {
-    GetOrders().then(function (data) {
-      setOrders(data);
-    });
+    const interval = setInterval(() => {
+      GetOrders().then(function (data) {
+        setOrders(data);
+      });
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
   return (
     <List key={Math.random(100)}>

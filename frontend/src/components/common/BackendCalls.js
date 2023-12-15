@@ -12,7 +12,7 @@ export const LoginData = async (data) => {
     localStorage.setItem("refresh_token", response.data.refresh_token);
     window.location.href = "/home";
   } catch (error) {
-    console.error("Greška prilikom poziva na backend:", error);
+    alert(error.response.data.message);
   }
 };
 
@@ -51,6 +51,39 @@ export const RegisterUser = async (data) => {
     .catch(function (error) {
       alert(error, "Something bad happende");
     });
+};
+export const ChangeUserPUT = async (data) => {
+  const response = await axios.put(
+    API_ENDPOINTS.USER_PUT,
+    {
+      username: data.username,
+      password: data.password,
+      email: data.email,
+      image: data.image,
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    }
+  );
+};
+
+export const ChangeUserPATCH = async (data) => {
+  const response = await axios.patch(
+    API_ENDPOINTS.USER_PATCH,
+    {
+      username: data.username,
+      password: data.password,
+      email: data.email,
+      image: data.image,
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    }
+  );
 };
 
 export const GetArticles = async () => {

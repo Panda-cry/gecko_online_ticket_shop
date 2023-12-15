@@ -18,14 +18,20 @@ const schema = yup.object({
 function OrderForm() {
   const dispach = useDispatch();
   const cartValue = useSelector((state) => state.chart.chart);
-  function handleSubmitForm(data) {
+  function handleSubmitForm(data, actions) {
     if (cartValue.length === 1) {
       data.article_id = cartValue[0].id;
-      PostOrder(data);
+      PostOrder(data).catch(function (error) {
+        console.log(error.response);
+        alert(error.response.data.message);
+      });
 
       dispach(chartActions.remove());
-      console.log(data);
     }
+    actions.resetForm({
+      values: { address: "", amount: 0, comment: "" },
+      // you can also set the other form states here
+    });
   }
   return (
     <Stack spacing={1}>

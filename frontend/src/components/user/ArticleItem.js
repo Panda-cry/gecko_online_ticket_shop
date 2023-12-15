@@ -24,7 +24,7 @@ function ArticleItem(props) {
   let image = "data:image/jpeg;base64," + props.image;
   return (
     <div>
-      <ListItem alignItems="flex-start" key={props.name} id={props.id}>
+      <ListItem alignItems="flex-start" key={props.id} id={props.id}>
         <ListItemAvatar>
           <Avatar alt="Remy Sharp" src={image} />
         </ListItemAvatar>

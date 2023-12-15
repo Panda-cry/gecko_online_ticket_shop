@@ -7,19 +7,22 @@ function ArticleList() {
   const [articles, setArticles] = useState([]);
   const [clicked, setClicked] = useState(true);
   useEffect(() => {
-    var items = GetArticles().then(function (data) {
-      setArticles(data);
-      setClicked(false);
-    });
-  }, [clicked]);
+    const interval = setInterval(() => {
+      GetArticles().then(function (data) {
+        setArticles(data);
+      });
+      console.log("Timer");
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
   return (
-    <List key={Math.random(100)}>
+    <List key={"123123"}>
       {Array.isArray(articles)
         ? articles.map((item) => (
             <ArticleItem
-              clicked={clicked}
+              clicked={setClicked}
               id={item.id}
-              key={Math.random(100)}
+              key={item.id}
               price={item.price}
               name={item.name}
               amount={item.amount}
