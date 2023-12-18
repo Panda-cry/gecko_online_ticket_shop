@@ -18,7 +18,7 @@ user_blueprint = Blueprint("user", __name__,
 @user_blueprint.route("/api/users")
 class UserView(MethodView):
 
-    @check_role(["USER"])
+    @check_role(["USER","SELLER"])
     @user_blueprint.response(200, UserSchemaDTO)
     def get(self):
         user_id = get_jwt_identity()
@@ -63,7 +63,7 @@ class UserView(MethodView):
 @user_blueprint.route('/api/users/orders')
 class UserOrderView(MethodView):
 
-    @check_role(["USER"])
+    @check_role(["USER","SELLER"])
     @user_blueprint.response(200,OrderSchema(many=True))
     def get(self):
         user_id = get_jwt_identity()

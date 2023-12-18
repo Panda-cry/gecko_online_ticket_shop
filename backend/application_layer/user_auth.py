@@ -36,7 +36,7 @@ class Login(MethodView):
         if user.user_type.name == "USER":
             access_token = create_access_token(identity=user.id,
                                                fresh=True,
-                                               expires_delta=timedelta(minutes=10),
+                                               expires_delta=timedelta(hours=5),
                                                additional_claims={
                                                    "user_type": user.user_type.name})
             refresh_token = create_refresh_token(identity=user.id,
@@ -96,7 +96,7 @@ class RefreshToken(MethodView):
             abort(404, message="Invalid user id")
 
         access_token = create_access_token(identity=user.id,
-                                           expires_delta=timedelta(minutes=10),
+                                           expires_delta=timedelta(hours=10),
                                            additional_claims={
                                                "user_type": user.user_type.name})
         refresh_token = create_refresh_token(identity=user.id,

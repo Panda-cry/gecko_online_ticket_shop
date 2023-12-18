@@ -1,8 +1,11 @@
-from marshmallow import Schema, fields, post_load, pre_load
+from marshmallow import Schema, fields, post_load, pre_load, post_dump
 from marshmallow.validate import OneOf, Length, Email
 from database_layer.user import UserRoleEnum
 from application_layer.schemas.orders_schema import OrderInUserSchema
 from flask_smorest.fields import Upload
+from os import getenv
+import os
+import base64
 
 
 class UserSchemaMixin(Schema):
@@ -32,6 +35,16 @@ class UserSchemaDTO(UserSchemaMixin):
     orders = fields.List(fields.Nested(OrderInUserSchema))
     image = fields.Str()
 
+    @post_dump
+    def _convert_image_to_base64(self, in_data, **kwargs):
+        image_url = f"{getenv('IMAGE_LOCATION')}/{in_data.get('image')}"
+        if os.path.isfile(image_url):
+            with open(image_url, "rb") as image:
+                encoded_image = base64.b64encode(image.read()).decode("utf-8")
+                in_data['image'] = encoded_image
+
+        return in_data
+
 
 class LoginSchema(Schema):
     username_email = fields.Str(required=True)
@@ -48,6 +61,7 @@ class UserPatchSchema(Schema):
     email = fields.Str(validate=Email())
     password = fields.Str(validate=Length(min=5))
     image = fields.Str()
+
 
 class UserPutSchema(Schema):
     username = fields.Str(required=True, validate=Length(min=5))
