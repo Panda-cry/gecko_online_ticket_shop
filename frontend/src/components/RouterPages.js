@@ -3,6 +3,8 @@ import LoginForm from "./login/loginForm";
 import RegisterForm from "./register/registerFrom";
 import MyApp from "./appLogic.js/MyApp";
 import AccountPage from "./common/AccountPage";
+import { jwtDecode } from "jwt-decode";
+
 function ShopRouter() {
   return (
     <BrowserRouter>

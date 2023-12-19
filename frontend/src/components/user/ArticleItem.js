@@ -10,6 +10,7 @@ import React from "react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { useDispatch, useSelector } from "react-redux";
 import { chartActions } from "../../store";
+import { toast } from "react-toastify";
 
 function ArticleItem(props) {
   const dispach = useDispatch();
@@ -17,7 +18,7 @@ function ArticleItem(props) {
   function handleAddToCart() {
     if (cartValue.length === 0) {
       dispach(chartActions.add({ id: props.id }));
-      alert("Submit form for order now");
+      toast.info("Submit form for order now");
       return;
     }
   }

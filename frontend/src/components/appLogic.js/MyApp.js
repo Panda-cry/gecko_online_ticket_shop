@@ -4,6 +4,9 @@ import RegisterForm from "../register/registerFrom";
 import { jwtDecode } from "jwt-decode";
 import NavBar from "../common/NavBar";
 import UserPage from "../user/userPage";
+import SellerPage from "../seller/SellerPage";
+import AdminPage from "../admin/AdminPage";
+import { ToastContainer } from "react-toastify";
 function MyApp() {
   const registerd = true;
   const role = jwtDecode(localStorage.getItem("access_token")).user_type;
@@ -13,8 +16,8 @@ function MyApp() {
       <NavBar></NavBar>
       {role === "USER" && <UserPage />}
 
-      {role === "SELLER" && <div>MAJA</div>}
-      {role === "ADMIN" && <div>MAJA</div>}
+      {role === "SELLER" && <SellerPage />}
+      {role === "ADMIN" && <AdminPage />}
     </React.Fragment>
   );
 }

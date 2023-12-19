@@ -1,19 +1,11 @@
 import { API_ENDPOINTS } from "../../api";
 import axios from "axios";
 export const LoginData = async (data) => {
-  try {
-    // Primer poziva ka backend endpointu
-    const response = await axios.post(API_ENDPOINTS.LOGIN, {
-      username_email: data.user_email,
-      password: data.password,
-    });
-
-    localStorage.setItem("access_token", response.data.access_token);
-    localStorage.setItem("refresh_token", response.data.refresh_token);
-    window.location.href = "/home";
-  } catch (error) {
-    alert(error.response.data.message);
-  }
+  const response = await axios.post(API_ENDPOINTS.LOGIN, {
+    username_email: data.user_email,
+    password: data.password,
+  });
+  return response.data;
 };
 
 export const UploadImage = async (image) => {
@@ -117,6 +109,79 @@ export const GetSum = async () => {
   const response = await axios.get(API_ENDPOINTS.SUM, {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+  return response.data;
+};
+export const GetUser = async () => {
+  const response = await axios.get(API_ENDPOINTS.USER, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+  return response.data;
+};
+
+export const ArticlePOST = async (data) => {
+  const response = await axios.post(API_ENDPOINTS.ARTICLE, data, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+};
+
+export const GetUsersAdmin = async () => {
+  const response = await axios.get(API_ENDPOINTS.USERS, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+  return response.data;
+};
+
+export const AdminVerifyUser = async (id) => {
+  const response = await axios.get(
+    API_ENDPOINTS.VERIFY + "/" + id + "/verify",
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    }
+  );
+  return response.data;
+};
+export const AdminDeleteUser = async (id) => {
+  const response = await axios.delete(
+    API_ENDPOINTS.VERIFY + "/" + id + "/verify",
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    }
+  );
+  return response.data;
+};
+export const AdminOrders = async (id) => {
+  const response = await axios.get(API_ENDPOINTS.ALL_ORDERS, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+  return response.data;
+};
+export const AdminAllUsers = async (id) => {
+  const response = await axios.get(API_ENDPOINTS.ALL_USERS, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+  return response.data;
+};
+
+export const RefreshToken = async () => {
+  const response = await axios.get(API_ENDPOINTS.REFRESH, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("refresh_token"),
     },
   });
   return response.data;

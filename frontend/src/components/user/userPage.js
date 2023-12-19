@@ -4,6 +4,7 @@ import OrderForm from "./OrderForm";
 import { Provider } from "react-redux";
 import store from "../../store";
 import OrdersList from "./OrdersList";
+import { GetOrders } from "../common/BackendCalls";
 
 function UserPage() {
   return (
@@ -16,7 +17,7 @@ function UserPage() {
           <OrderForm></OrderForm>{" "}
         </Grid>
         <Grid item xs={4}>
-          <OrdersList></OrdersList>
+          <OrdersList func={GetOrders}></OrdersList>
         </Grid>
       </Grid>
     </Provider>

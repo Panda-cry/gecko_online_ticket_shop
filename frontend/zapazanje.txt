@@ -1,0 +1,5 @@
+Mozda je bolje da se kroistio redux za logovanje i protekciju ruta mozda 
+mesto tokena 
+onda na docker mozemo da imamo 2 stage prvi da bilda react app 
+i da generise build da generise staticke stvari jer i nginx ima tako nesto slicno 
+i 2 stage je nginx i prekopiramo iz builda u nginx i napravimo servericu sa nginx.conf tjt 

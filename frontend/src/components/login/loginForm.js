@@ -7,6 +7,7 @@ import { Field, Form, Formik } from "formik";
 import * as yup from "yup";
 import { LoginData } from "../common/BackendCalls";
 import { MyTextInput } from "../common/InputFields";
+import { ToastContainer, toast } from "react-toastify";
 
 const schema = yup.object({
   user_email: yup.string().required("Username or email is required"),
@@ -15,8 +16,14 @@ const schema = yup.object({
 
 function LoginForm() {
   function handleSubmitForm(data) {
-    console.log(data);
-    LoginData(data);
+    LoginData(data)
+      .then(function (response) {
+        localStorage.setItem("access_token", response.access_token);
+        localStorage.setItem("refresh_token", response.refresh_token);
+        window.location.href = "/home";
+        toast.success("Logged in");
+      })
+      .catch(function (error) {});
   }
   return (
     <div>
@@ -59,6 +66,7 @@ function LoginForm() {
 
         <Link to="register">Don't have an account? Sign Up</Link>
       </Stack>
+      <ToastContainer />
     </div>
   );
 }

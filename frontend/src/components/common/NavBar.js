@@ -9,17 +9,39 @@ import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { GetSum } from "./BackendCalls";
+import { GetSum, GetUser, RefreshToken } from "./BackendCalls";
+import "react-toastify/dist/ReactToastify.css";
+import { jwtDecode } from "jwt-decode";
+import { ToastContainer, toast } from "react-toastify";
 function NavBar() {
+  const role = jwtDecode(localStorage.getItem("access_token")).user_type;
+
   function handleClick() {
     localStorage.clear();
     window.location.href = "/";
   }
   const [sum, setSum] = useState(0);
   useEffect(() => {
-    GetSum().then(function (response) {
-      setSum(response["Sum is :"]);
-    });
+    if (role !== "ADMIN") {
+      GetSum()
+        .then(function (response) {
+          setSum(response["Sum is :"]);
+        })
+        .catch(function (error) {
+          console.log(error);
+          if (error.response.status === 401) {
+            RefreshToken()
+              .then(function (response) {
+                localStorage.setItem("access_token", response.access_token);
+                localStorage.setItem("refresh_token", response.refresh_token);
+                toast.success("Refreshed in");
+              })
+              .catch(function (error) {
+                toast.error("Server error porbably");
+              });
+          }
+        });
+    }
   }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -37,9 +59,12 @@ function NavBar() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Welcome
           </Typography>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Delivery cost : {sum}
-          </Typography>
+          {role !== "ADMIN" ? (
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Delivery cost : {sum}
+            </Typography>
+          ) : null}
+
           <Button>
             <Link
               to="/account"
@@ -54,6 +79,7 @@ function NavBar() {
           </Button>
         </Toolbar>
       </AppBar>
+      <ToastContainer />
     </Box>
   );
 }
