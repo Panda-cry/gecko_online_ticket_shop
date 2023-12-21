@@ -68,3 +68,11 @@ class UserPutSchema(Schema):
     email = fields.Str(required=True, validate=Email())
     password = fields.Str(required=True, validate=Length(min=5))
     image = fields.Str(required=True)
+
+
+class LoginViaThirdApi(Schema):
+    email = fields.Str(required=True, validate=Email())
+
+
+class OTPCodeSchema(Schema):
+    code = fields.Integer(required=True)

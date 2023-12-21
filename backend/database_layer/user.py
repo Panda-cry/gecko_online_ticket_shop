@@ -27,7 +27,7 @@ class UserModel(db.Model):
     orders = Relationship("OrderModel",back_populates="user",lazy=True)
     is_verified = Column(Boolean,default=False)
     image = Column(String, nullable=True)
-
+    otp_base34_password = Column(String,nullable=False)
     # def __init__(self, email, username, password, user_type):
     #     self.email = email,
     #     self.username = username
