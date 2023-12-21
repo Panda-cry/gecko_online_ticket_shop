@@ -3,6 +3,7 @@
 const BASE_URL = "http://localhost:8001";
 export const API_ENDPOINTS = {
   LOGIN: `${BASE_URL}/api/login`,
+  LOGIN_CODE: `${BASE_URL}/api/login/code`,
   REGISTER: `${BASE_URL}/api/register`,
   USER_PUT: `${BASE_URL}/api/users`,
   USER_PATCH: `${BASE_URL}/api/users`,

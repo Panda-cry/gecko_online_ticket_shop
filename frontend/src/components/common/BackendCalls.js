@@ -192,3 +192,17 @@ export const LoginViaApi = async (email) => {
   });
   return response.data;
 };
+export const LoginWithCode = async (code) => {
+  const response = await axios.post(
+    API_ENDPOINTS.LOGIN_CODE,
+    {
+      code: code,
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    }
+  );
+  return response.data;
+};
