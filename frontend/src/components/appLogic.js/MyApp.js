@@ -6,7 +6,8 @@ import NavBar from "../common/NavBar";
 import UserPage from "../user/userPage";
 import SellerPage from "../seller/SellerPage";
 import AdminPage from "../admin/AdminPage";
-import { ToastContainer } from "react-toastify";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 function MyApp() {
   const registerd = true;
   const role = jwtDecode(localStorage.getItem("access_token")).user_type;

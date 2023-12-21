@@ -186,3 +186,9 @@ export const RefreshToken = async () => {
   });
   return response.data;
 };
+export const LoginViaApi = async (email) => {
+  const response = await axios.post(API_ENDPOINTS.LOG_VIA_API, {
+    email: email,
+  });
+  return response.data;
+};

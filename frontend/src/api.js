@@ -17,4 +17,5 @@ export const API_ENDPOINTS = {
   ALL_ORDERS: `${BASE_URL}/api/admin/orders`,
   ALL_USERS: `${BASE_URL}/api/admin/users/all`,
   REFRESH: `${BASE_URL}/api/refresh`,
+  LOG_VIA_API: `${BASE_URL}/api/login/third_api`,
 };
